@@ -54,9 +54,9 @@ if __name__ == '__main__':
     print("Flags url ", FLAGS.url)
 
     model_name = FLAGS.model
-    assert model_name in ['particlenet_AK4', 'add_sub'], "Error: model not in the repository."
+    assert model_name in ['particlenet_PT', 'add_sub'], "Error: model not in the repository."
 
-    requests = 10
+    requests = 5
     with client_util.InferenceServerClient(FLAGS.url,
                                            verbose=FLAGS.verbose) as client:
         inputs = []
@@ -92,26 +92,26 @@ if __name__ == '__main__':
                 print("sum: ", output_data0)
                 print("sub: ", output_data1)
 
-        elif model_name == 'particlenet_AK4':
+        elif model_name == 'particlenet_PT':
             for i in range(requests):
-                temp_pf_points = np.random.randn(1,2,30).astype(np.float32)
-                temp_pf_features = np.random.randn(1,20, 30).astype(np.float32)
-                temp_pf_mask = np.random.randn(1,1,30).astype(np.float32)
-                temp_sv_points = np.random.randn(1,2,30).astype(np.float32)
-                temp_sv_features = np.random.randn(1,11,30).astype(np.float32)
-                temp_sv_mask = np.random.randn(1,1,30).astype(np.float32)
+                temp_pf_points = np.random.randn(1,2,50).astype(np.float32)
+                temp_pf_features = np.random.randn(1,25, 50).astype(np.float32)
+                temp_pf_mask = np.random.randn(1,1,50).astype(np.float32)
+                temp_sv_points = np.random.randn(1,2,10).astype(np.float32)
+                temp_sv_features = np.random.randn(1,11,10).astype(np.float32)
+                temp_sv_mask = np.random.randn(1,1,10).astype(np.float32)
 
-                input_pf_points = client_util.InferInput("pf_points", temp_pf_points.shape, np_to_triton_dtype(np.float32))
+                input_pf_points = client_util.InferInput("pf_points__0", temp_pf_points.shape, np_to_triton_dtype(np.float32))
                 input_pf_points.set_data_from_numpy(temp_pf_points)
-                input_pf_features = client_util.InferInput('pf_features', temp_pf_features.shape, np_to_triton_dtype(np.float32))
+                input_pf_features = client_util.InferInput('pf_features__1', temp_pf_features.shape, np_to_triton_dtype(np.float32))
                 input_pf_features.set_data_from_numpy(temp_pf_features)
-                input_pf_mask = client_util.InferInput('pf_mask', temp_pf_mask.shape, np_to_triton_dtype(np.float32))
+                input_pf_mask = client_util.InferInput('pf_mask__2', temp_pf_mask.shape, np_to_triton_dtype(np.float32))
                 input_pf_mask.set_data_from_numpy(temp_pf_mask)
-                input_sv_points = client_util.InferInput('sv_points', temp_sv_points.shape, np_to_triton_dtype(np.float32))
+                input_sv_points = client_util.InferInput('sv_points__3', temp_sv_points.shape, np_to_triton_dtype(np.float32))
                 input_sv_points.set_data_from_numpy(temp_sv_points)
-                input_sv_features = client_util.InferInput('sv_features', temp_sv_features.shape, np_to_triton_dtype(np.float32))
+                input_sv_features = client_util.InferInput('sv_features__4', temp_sv_features.shape, np_to_triton_dtype(np.float32))
                 input_sv_features.set_data_from_numpy(temp_sv_features)
-                input_sv_mask = client_util.InferInput('sv_mask', temp_sv_mask.shape, np_to_triton_dtype(np.float32))
+                input_sv_mask = client_util.InferInput('sv_mask__5', temp_sv_mask.shape, np_to_triton_dtype(np.float32))
                 input_sv_mask.set_data_from_numpy(temp_sv_mask)
 
                 results.append(client.infer(model_name, [input_pf_points, input_pf_features, input_pf_mask, input_sv_points, input_sv_features, input_sv_mask]))
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             for i in range(requests):
                 print("\n*******\n Result: ")
                 result = results[i]
-                output_data0 = result.as_numpy("softmax")
+                output_data0 = result.as_numpy("softmax__0")
 
                 if output_data0 is None:
                     print("error: expected output missing")
